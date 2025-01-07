@@ -1,66 +1,64 @@
-import { useState, useEffect } from "react";
+// useState: React Hook used to manage state in functional components
+// useEffect: React Hook used to handle side effects
+import React, { useState, useEffect } from "react";
 
-import CoffeeCard from "./CofeeCard";
+import MovieCard from "./MovieCard";
+import SearchIcon from "./search.svg";
+import "./App.css";
 
-import './App.css';
-import SearchIcon from './search.svg';
+const API_URL = "http://www.omdbapi.com?apikey=b6003d8a";
 
-// API Key
-const API_URL = 'http://www.omdbapi.com?apikey=4de70aba';
-
+// Main functional React component
 const App = () => {
-    const [beans, setBeans] = useState([]);
+  // searchTerm/movie: A piece of state to store input
+  // setSearchTerm/setMovies: A function to update the value
+  const [searchTerm, setSearchTerm] = useState("");
+  const [movies, setMovies] = useState([]);
 
-    // Function to search for movies
-    const searchBeans = async (title) => {
-        try {
-            const response = await fetch(`${API_URL}&s=${title}`);
-            const data = await response.json();
+  // [] Dependency Array: Effect will only run once when the component mounts
+  useEffect(() => {
+    searchMovies("Batman");
+  }, []);
 
-            setBeans(data.searchBeans);
-        } catch (error) {
-            console.error('Error fetching data:', error);
-        }
-    };
+  const searchMovies = async (title) => {
+    // fetch: A built-in JavaScript function to make HTTP requests
+    const response = await fetch(`${API_URL}&s=${title}`);
+    // Parses the response from the API into a JSON object
+    const data = await response.json();
 
-    // Run searchMovies on component mount
-    useEffect(() => {
-        searchBeans('Spiderman');
-    }, []);
+    setMovies(data.Search);
+  };
 
-    return (
-        <div className="app">
-            <h1>CoffeeLand</h1>
+  return (
+    <div className="app">
+      <h1>MovieLand</h1>
 
-            <div className="search">
-                <input 
-                    placeholder="Search for coffee beans?" 
-                    value="Panama Gesha"
-                    onChange={() => {}}
-                />
-                <img
-                    src={SearchIcon}
-                    alt="search"
-                    onClick={() => {}}
-                />
-            </div>
+      <div className="search">
+        <input
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder="Search for movies"
+        />
+        <img
+          src={SearchIcon}
+          alt="search"
+          onClick={() => searchMovies(searchTerm)}
+        />
+      </div>
 
-            {beans?.length > 0
-                ? (
-                    <div className="container"> 
-                        {beans.map((coffeeBean) => (
-                            <CoffeeCard coffeeBean={  }/>
-                        ))}
-                    </div>
-                ) : (
-                    <div className="empty">     
-                        <h2>No Beans Found</h2>
-                    </div>
-                )
-            }
-            
+      {movies?.length > 0 ? (
+        <div className="container">
+          {movies.map((movie) => (
+            <MovieCard movie={movie} />
+          ))}
         </div>
-    );
+      ) : (
+        <div className="empty">
+          <h2>No movies found</h2>
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default App;
